@@ -1,3 +1,7 @@
+/** https://koajs.com/ 
+ * stopped at `Context`
+*/
+
 const   http = require("http")
     ,   koa = require("koa");
 
@@ -56,6 +60,12 @@ koa_app.use(async (ctx) => {
     ctx.body = 'Hello world from Koa app 2';
     ctx.println("Just some stuff2.0");
 
+});
+
+
+// error handling
+app.on('error', err => {
+    log.error('server error', err)
 });
 
 
