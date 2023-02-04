@@ -40,8 +40,6 @@ app.use(async ctx => {
 });
 
 
-
-
 app.keys = ["somethingsomethingfortheheader"]; // keys to sign cookies with
 
 
