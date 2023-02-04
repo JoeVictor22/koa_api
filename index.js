@@ -1,13 +1,20 @@
-const http = require("http");
+const   http = require("http")
+    ,   koa = require("koa");
 
-const koa = require("koa");
 const app = new koa();
 
 
-// each async "middleware" we create works as a downstream to upstream, instead of callbacks
-// so we can create a stream of events throught the lifecycle of the request
+/** Koa Architecture
+ * 
+Basically, koa works as a stack of middlewares that cascades upstream
+So, we can define a middleware, call the next() function, and pass control to the next middleware on the stack
+After there is no middleware to be executed, control comes back cascading from downstream
+each async "middleware" we create works as a downstream to upstream, instead of callbacks
+so we can create a stream of events throught the lifecycle of the request
+*/
 
-// definig a logger middleware with infos about method, url and time
+
+// defining a logger middleware with info about method, url and time
 app.use(async (ctx, next) => {
     await next();
     const rt = ctx.response.get("X-Response-Time");
@@ -29,19 +36,34 @@ app.use(async ctx => {
 });
 
 
-// a koa app is just a route with a stream
-coa_app = new koa();
-coa_app.use(async (ctx) => {
-    ctx.body = 'Testing';
+
+
+app.keys = ["somethingsomethingfortheheader"]; // keys to sign cookies with
+
+
+// a koa app is just a route with a stream, so we can create another and just serve it
+koa_app = new koa();
+
+// app.context is the prototype object for ctx, so we can virtually add anything we may need to it
+function println(some_object) {
+    // i dont know why yet, but this is running 2 times per call
+    console.log(some_object);
+}
+koa_app.context.println = println;
+koa_app.context.some_db_we_may_need = object();
+koa_app.use(async (ctx) => {
+    ctx.println("Just some stuff");
+    ctx.body = 'Hello world from Koa app 2';
+    ctx.println("Just some stuff2.0");
+
 });
 
 
 // http serve configuration
 // app.listen(3000); // single server 
 
-
 http.createServer(app.callback()).listen(3000); // you can mount the koa app in other frameworks using callback()
-http.createServer(coa_app.callback()).listen(3001);
+http.createServer(koa_app.callback()).listen(3001);
 
 
 
